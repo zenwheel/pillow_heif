@@ -1242,9 +1242,10 @@ static PyObject* _CtxImage_camera_extrinsic_matrix_pos(CtxImageObject* self, voi
             Py_RETURN_NONE;
         }
 
-        double pos_x = (double)camera_extrinsic_matrix->pos_x / 1000.0;
-        double pos_y = (double)camera_extrinsic_matrix->pos_y / 1000.0;
-        double pos_z = (double)camera_extrinsic_matrix->pos_z / 1000.0;
+        int32_t *pos = (int32_t*)(void*)camera_extrinsic_matrix;
+        double pos_x = (double)pos[0] / 1000.0;
+        double pos_y = (double)pos[1] / 1000.0;
+        double pos_z = (double)pos[2] / 1000.0;
 
         heif_camera_extrinsic_matrix_release(camera_extrinsic_matrix);
         return Py_BuildValue("(ddd)", pos_x, pos_y, pos_z);
