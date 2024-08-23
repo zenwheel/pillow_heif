@@ -1231,6 +1231,29 @@ static PyObject* _CtxImage_camera_extrinsic_matrix_rot(CtxImageObject* self, voi
     #endif
 }
 
+static PyObject* _CtxImage_camera_extrinsic_matrix_pos(CtxImageObject* self, void* closure) {
+    #if LIBHEIF_HAVE_VERSION(1,18,0)
+        struct heif_camera_extrinsic_matrix* camera_extrinsic_matrix;
+
+        if (!heif_image_handle_has_camera_extrinsic_matrix(self->handle)) {
+            Py_RETURN_NONE;
+        }
+        if (check_error(heif_image_handle_get_camera_extrinsic_matrix(self->handle, &camera_extrinsic_matrix))) {
+            Py_RETURN_NONE;
+        }
+
+        int32_t *pos = (int32_t*)(void*)camera_extrinsic_matrix;
+        double pos_x = (double)pos[0] / 1000.0;
+        double pos_y = (double)pos[1] / 1000.0;
+        double pos_z = (double)pos[2] / 1000.0;
+
+        heif_camera_extrinsic_matrix_release(camera_extrinsic_matrix);
+        return Py_BuildValue("(ddd)", pos_x, pos_y, pos_z);
+    #else
+        Py_RETURN_NONE;
+    #endif
+}
+
 /* =========== CtxImage properties available to Python Part ======== */
 
 static struct PyGetSetDef _CtxImage_getseters[] = {
@@ -1246,6 +1269,7 @@ static struct PyGetSetDef _CtxImage_getseters[] = {
     {"data", (getter)_CtxImage_data, NULL, NULL, NULL},
     {"depth_image_list", (getter)_CtxImage_depth_image_list, NULL, NULL, NULL},
     {"camera_intrinsic_matrix", (getter)_CtxImage_camera_intrinsic_matrix, NULL, NULL, NULL},
+    {"camera_extrinsic_matrix_pos", (getter)_CtxImage_camera_extrinsic_matrix_pos, NULL, NULL, NULL},
     {"camera_extrinsic_matrix_rot", (getter)_CtxImage_camera_extrinsic_matrix_rot, NULL, NULL, NULL},
     {NULL, NULL, NULL, NULL, NULL}
 };

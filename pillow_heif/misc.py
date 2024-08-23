@@ -358,6 +358,9 @@ def _get_heif_meta(c_image) -> dict:
     _camera_extrinsic_matrix_rot = c_image.camera_extrinsic_matrix_rot
     if _camera_extrinsic_matrix_rot:
         r["camera_extrinsic_matrix_rot"] = _camera_extrinsic_matrix_rot
+    _camera_extrinsic_matrix_pos = c_image.camera_extrinsic_matrix_pos
+    if _camera_extrinsic_matrix_pos:
+        r["camera_extrinsic_matrix_pos"] = _camera_extrinsic_matrix_pos
     return r
 
 
@@ -482,6 +485,7 @@ class MimCImage:
         self.colorspace = HeifColorspace.UNDEFINED.value
         self.camera_intrinsic_matrix = None
         self.camera_extrinsic_matrix_rot = None
+        self.camera_extrinsic_matrix_pos = None
 
     @property
     def size_mode(self):
