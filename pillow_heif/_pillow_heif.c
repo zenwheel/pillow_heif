@@ -1157,6 +1157,13 @@ static PyObject* _CtxImage_data(CtxImageObject* self, void* closure) {
     return PyMemoryView_FromMemory((char*)self->data, self->stride * self->height, PyBUF_READ);
 }
 
+static PyObject* _CtxImage_id(CtxImageObject* self, void* closure) {
+    if (!self->data)
+        if (!decode_image(self))
+            return NULL;
+    return PyLong_FromLong(self->id);
+}
+
 static PyObject* _CtxImage_depth_image_list(CtxImageObject* self, void* closure) {
     int n_images = heif_image_handle_get_number_of_depth_images(self->handle);
     if (n_images == 0)
@@ -1267,6 +1274,7 @@ static struct PyGetSetDef _CtxImage_getseters[] = {
     {"thumbnails", (getter)_CtxImage_thumbnails, NULL, NULL, NULL},
     {"stride", (getter)_CtxImage_stride, NULL, NULL, NULL},
     {"data", (getter)_CtxImage_data, NULL, NULL, NULL},
+    {"id", (getter)_CtxImage_id, NULL, NULL, NULL},
     {"depth_image_list", (getter)_CtxImage_depth_image_list, NULL, NULL, NULL},
     {"camera_intrinsic_matrix", (getter)_CtxImage_camera_intrinsic_matrix, NULL, NULL, NULL},
     {"camera_extrinsic_matrix_pos", (getter)_CtxImage_camera_extrinsic_matrix_pos, NULL, NULL, NULL},
