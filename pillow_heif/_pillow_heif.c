@@ -75,6 +75,7 @@ static PyTypeObject CtxWrite_Type;
 typedef struct {
     PyObject_HEAD
     enum ph_image_type image_type;              // 0 - standard, 2 - depth image
+    uint32_t id;
     int width;                                  // size[0];
     int height;                                 // size[1];
     int bits;                                   // one of: 8, 10, 12.
@@ -794,7 +795,7 @@ static void _CtxImage_destructor(CtxImageObject* self) {
     PyObject_Del(self);
 }
 
-PyObject* _CtxImage(struct heif_image_handle* handle, int hdr_to_8bit,
+PyObject* _CtxImage(heif_item_id id, struct heif_image_handle* handle, int hdr_to_8bit,
                     int bgr_mode, int remove_stride, int hdr_to_16bit,
                     int reload_size, int primary, PyObject* file_bytes,
                     const char *decoder_id,
@@ -805,6 +806,7 @@ PyObject* _CtxImage(struct heif_image_handle* handle, int hdr_to_8bit,
         heif_image_handle_release(handle);
         Py_RETURN_NONE;
     }
+    ctx_image->id = id;
     ctx_image->depth_metadata = NULL;
     ctx_image->image_type = PhHeifImage;
     ctx_image->width = heif_image_handle_get_width(handle);
@@ -1399,7 +1401,7 @@ static PyObject* _load_file(PyObject* self, PyObject* args) {
             if (error.code == heif_error_Ok) {
                 PyList_SET_ITEM(images_list,
                                 i,
-                                _CtxImage(handle, hdr_to_8bit,
+                                _CtxImage(images_ids[i], handle, hdr_to_8bit,
                                     bgr_mode, remove_stride, hdr_to_16bit, reload_size, primary, heif_bytes,
                                     decoder_id, colorspace, chroma));
             } else {
