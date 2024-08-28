@@ -154,6 +154,7 @@ class HeifImage(BaseImage):
         )
         _heif_meta = _get_heif_meta(c_image)
         self.info = {
+            "id": int(c_image.id),
             "primary": bool(c_image.primary),
             "bit_depth": int(c_image.bit_depth),
             "exif": _exif,
